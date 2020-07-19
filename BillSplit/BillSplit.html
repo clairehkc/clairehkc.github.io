@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<script src="BillSplit.js"></script>
+		<link rel="stylesheet" href="BillSplit.css">
+	</head>
+	<body>
+		<h1>dolla dolla bill ya'll</h1>
+		<div id="billInputContainer">
+			<div id="billInputTitle">Paste Bill:</div>
+			<div id="billInputDescription">
+				<p>Copy/Paste the pricing info from your email receipt.</p>
+				<p>Currently supports Group Orders from Uber Eats.</p>
+			</div>
+			<textarea id="billInput" rows="15" cols="50"></textarea>
+			<br>
+			<button onclick="splitBill()">Split Bill</button>
+			<button onclick="loadExample()">Example Bill</button>
+		</div>
+		<div id="splitResultsContainer">
+			<div id="splitResultsTitle">Split:</div>
+			<div id="splitResults"></div>
+		</div>
+	</body>
+</html>
