@@ -2,8 +2,8 @@ body {
 	background-color: #111109;
 	color: #FFF;
 	font-family: Arial, Helvetica, sans-serif;
-	padding: 16px;
-	font-size: 1em;
+	padding: 1em;
+	font-size: 16px;
 }
 
 textarea {
@@ -13,14 +13,14 @@ textarea {
   border: none;
   overflow: auto;
   outline: none;
-  min-width: 500px;
+  min-width: 512px;
 }
 
 button {
   background-color: #00cc99;
   border: none;
   color: #FFF;
-  padding: 15px 32px;
+  padding: 1em 2em;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -33,14 +33,24 @@ button {
   body {
   	font-size: 1.2em;
   }
+
+  #bodyContainer {
+  	width: 100%;
+  }
   
   textarea {
-  	min-width: 80%;
+  	min-width: 100%;
+  	width: 100%;
   }
 
   button {
   	min-width: 100px;
-  	padding: 12px 15px;
+  	padding: 0.8em 1.2em;
+  	font-size: 0.8em;
+  }
+
+  #buttonContainer {
+  	width: 100%;
   }
 }
 
@@ -69,7 +79,7 @@ button {
 	display: flex;
 	flex-flow: row;
 	justify-content: space-between;
-	max-width: 500px;
+	max-width: 32em;
 	margin-right: 10px;
 }
 
@@ -110,6 +120,7 @@ button {
 	margin-left: 5px;
 	border: none;
 	outline: none;
+	height: 1.75em;
 }
 
 .assignmentMode {
@@ -127,4 +138,8 @@ button {
 	margin-top: 10px;
 	min-width: 25px;
 	padding: 10px 24px;
+}
+
+#assignTextContainer {
+	margin-bottom: 1em;
 }

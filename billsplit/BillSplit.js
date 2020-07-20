@@ -116,7 +116,7 @@ function createUserItemsContainer(details, user, shouldShowInputs = false) {
 	userItemsContainer.className = "userItemsContainer";
 	Object.keys(details[user].items).forEach(item => {
 		const itemContainer = document.createElement("div");
-		itemContainer.className = "itemContainer";
+		itemContainer.className = shouldShowInputs ? "itemContainer assignmentMode" : "itemContainer";
 		const quantity = details[user].items[item].quantity;
 		const quantityLabel = (quantity > 1) ? " x" + quantity : "";
 		const userItem = document.createTextNode(item + quantityLabel);
@@ -167,8 +167,11 @@ function listItemsForAssignment(details) {
 	const userResultContainer = document.createElement("div");
 	userResultContainer.className = "userResultContainer";
 
+	const assignTextContainer = document.createElement("div");
+	assignTextContainer.id = "assignTextContainer";
 	const assignText = document.createTextNode("Assign items to people:");
-	userResultContainer.appendChild(assignText);
+	assignTextContainer.appendChild(assignText);
+	userResultContainer.appendChild(assignTextContainer);
 
 	userResultContainer.appendChild(createUserItemsContainer(details, "TBD", true));
 
