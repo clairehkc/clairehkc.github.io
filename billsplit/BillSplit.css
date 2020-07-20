@@ -3,30 +3,58 @@ body {
 	color: #FFF;
 	font-family: Arial, Helvetica, sans-serif;
 	padding: 16px;
+	font-size: 1em;
 }
 
 textarea {
 	margin-bottom: 10px;
+	margin-right: 10px;
   resize: none;
   border: none;
   overflow: auto;
   outline: none;
+  min-width: 500px;
 }
 
 button {
-  background-color: #33cccc;
+  background-color: #00cc99;
   border: none;
   color: #FFF;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 1em;
+  min-width: 150px;
   outline: none;
+}
+
+@media only screen and (max-width:480px) { 
+  body {
+  	font-size: 1.2em;
+  }
+  
+  textarea {
+  	min-width: 80%;
+  }
+
+  button {
+  	min-width: 100px;
+  	padding: 12px 15px;
+  }
+}
+
+#bodyContainer {
+	display: flex;
+	flex-direction: column;
 }
 
 #billInputContainer {
 	margin-bottom: 32px;
+}
+
+#splitResultsContainer {
+	visibility: hidden;
 }
 
 #billInputTitle, #splitResultsTitle, #billInputDescription {
@@ -34,7 +62,15 @@ button {
 }
 
 #billInputTitle, #splitResultsTitle {
-	font-size: 20px;
+	font-size: 1.2em;
+}
+
+#buttonContainer {
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+	max-width: 500px;
+	margin-right: 10px;
 }
 
 #allUserResultsContainer {
@@ -43,7 +79,7 @@ button {
 
 .userResultContainer {
 	padding-left: 10px;
-	margin-bottom: 32px;
+	margin-bottom: 24px;
 }
 
 .userItemsContainer, .userTotalContainer {
@@ -51,5 +87,44 @@ button {
 }
 
 .userTotalContainer {
-	color: #33cccc;
+	color: #00cc99;
+}
+
+.usernameContainer {
+	padding-bottom: 5px;
+}
+
+.itemContainer, .userTotalContainer {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.itemContainer {
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+	max-width: 480px;
+}
+
+.nameInput {
+	margin-left: 5px;
+	border: none;
+	outline: none;
+}
+
+.assignmentMode {
+	border-bottom: 1px solid #f0f0f5;
+}
+
+#doneButtonContainer {
+	display: flex;
+	flex-flow: row;
+	justify-content: flex-end;
+	max-width: 495px;
+}
+
+#doneButton {
+	margin-top: 10px;
+	min-width: 25px;
+	padding: 10px 24px;
 }
