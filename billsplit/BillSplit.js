@@ -258,7 +258,7 @@ function splitBill(manualInputDetails = null) {
 				const itemLineIndex = i;
 				const itemQuantity = parseInt(matchedInt[0]);
 
-				if (i == 0) {
+				if (!currentUser) {
 					// no user, ask to assign users
 					currentUser = "TBD";
 					details[currentUser] = {items: {}, total: 0, fees: 0};
@@ -269,12 +269,6 @@ function splitBill(manualInputDetails = null) {
 						const user = potentialUser.trim();
 						currentUser = user;
 						details[currentUser] = {items: [], total: 0, fees: 0};
-					} else {
-						if (!currentUser) {
-							console.error("invalid input");
-							displayErrorMessage();
-							return;
-						}
 					}
 				}
 
