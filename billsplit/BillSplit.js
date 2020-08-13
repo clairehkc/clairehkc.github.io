@@ -258,11 +258,7 @@ function splitBill(manualInputDetails = null) {
 				const itemLineIndex = i;
 				const itemQuantity = parseInt(matchedInt[0]);
 
-				if (!currentUser) {
-					// no user, ask to assign users
-					currentUser = "TBD";
-					details[currentUser] = {items: {}, total: 0, fees: 0};
-				} else {
+				if (itemLineIndex > 0) {
 					const potentialUser = lines[itemLineIndex-1];
 					if (!(potentialUser.startsWith("$") || /^\s/.test(potentialUser))) {
 						// found new user
@@ -272,7 +268,13 @@ function splitBill(manualInputDetails = null) {
 					}
 				}
 
-				const itemName = lines[itemLineIndex+1];
+				if (!currentUser) {
+					// no user, ask to assign users
+					currentUser = "TBD";
+					details[currentUser] = {items: {}, total: 0, fees: 0};
+				}
+
+				let itemName = lines[itemLineIndex+1];
 				let itemPrice = lines[itemLineIndex+2];
 				if (!(itemPrice.startsWith("$"))) {
 					console.error("invalid input");
@@ -281,6 +283,26 @@ function splitBill(manualInputDetails = null) {
 				}
 
 				itemPrice = priceToFloat(itemPrice);
+
+				if (itemQuantity > 1 && currentUser == "TBD") {
+					// automatically split multi-quantity items for assignment mode in non-group orders
+					for (let j = 0; j < itemQuantity; j++) {
+						if (itemName in details[currentUser].items) {
+							const itemNameCount = Object.keys(details[currentUser].items).filter(name => name.includes(itemName)).length;
+							itemName = itemName + " " + (itemNameCount + 1);
+						}
+						details[currentUser].items[itemName] = {};
+						details[currentUser].items[itemName].price = itemPrice;
+						details[currentUser].items[itemName].quantity = 1;
+						details[currentUser].total = details[currentUser].total + itemPrice;
+					}
+					continue;
+				}
+
+				if (itemName in details[currentUser].items) {
+					const itemNameCount = Object.keys(details[currentUser].items).filter(name => name.includes(itemName)).length;
+					itemName = itemName + " " + (itemNameCount + 1);
+				}
 				details[currentUser].items[itemName] = {};
 				details[currentUser].items[itemName].price = itemPrice;
 				details[currentUser].items[itemName].quantity = itemQuantity;
