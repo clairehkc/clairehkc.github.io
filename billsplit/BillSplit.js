@@ -238,7 +238,7 @@ function splitBill(manualInputDetails = null) {
 	reset();
 	const details = manualInputDetails || {};
 	const input = document.getElementById("billInput").value.trim();
-	let tax = promotion = serviceFee = discount = deliveryFee = deliveryDiscount = tip = 0;
+	let tax = promotion = serviceFee = discount = offer = deliveryFee = deliveryDiscount = tip = 0;
 	const lines = input.split('\n');
 	let currentUser;
 
@@ -285,6 +285,7 @@ function splitBill(manualInputDetails = null) {
 					displayErrorMessage();
 					return;
 				}
+
 				itemPrice = priceToFloat(itemPrice);
 				details[currentUser].items[itemName] = {};
 				details[currentUser].items[itemName].price = itemPrice;
@@ -317,6 +318,9 @@ function splitBill(manualInputDetails = null) {
 		} else if (cleanedLine.startsWith("DISCOUNT")) {
 			discount = priceToFloat(getEOLPrice(lines[i]));
 			distributeFees(details, discount);
+		} else if (cleanedLine.includes("OFFER")) {
+			offer = priceToFloat(getEOLPrice(lines[i]));
+			distributeFees(details, offer);
 		} else if (cleanedLine.startsWith("DELIVERYFEE")) {
 			deliveryFee = priceToFloat(getEOLPrice(lines[i]));
 			distributeFees(details, deliveryFee);
