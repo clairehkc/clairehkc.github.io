@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Score Following App</title>
+
+  <script src="../lib/p5.min.js"></script>
+  <script src="../lib/addons/p5.sound.min.js"></script>
+  <script src="https://unpkg.com/ml5@0.6.0/dist/ml5.min.js"></script>
+  <script src="https://unpkg.com/meyda/dist/web/meyda.min.js"></script>
+  <script src="../lib/opensheetmusicdisplay.min.js"></script>
+
+  <script src="scripts/NoteEventDetector/NoteEvent.js"></script>  
+  <script src="scripts/NoteEventDetector/PitchDetector.js"></script>  
+  <script src="scripts/NoteEventDetector/ChordDetector.js"></script>
+  <script src="scripts/NoteEventDetector/NoteEventDetector.js"></script>
+  
+  <script src="scripts/ScoreParser.js"></script>
+  <script src="scripts/sketch.js"></script>
+
+  <link rel="stylesheet" href="style/index.css">
+</head>
+
+<body>
+  <input type="file" id="scoreInput" accept="text/xml, .musicxml" style="display:none" />
+  <div id="navBar">
+    <div class="navButton inactive" id="uploadNavButton" title="Upload Score">
+      <img class="navButtonIcon" src="style/icons/upload.svg" />
+    </div>
+    <div class="navButton active" id="scoreNavButton" title="Score View">
+      <img class ="navButtonIcon" src="style/icons/sheet-music.svg" />
+    </div>
+    <div class="navButton inactive" id="libraryNavButton" title="Library">
+      <img class="navButtonIcon" src="style/icons/agenda.svg" />
+    </div>
+  </div>
+  <div class="view hidden" id="libraryView">
+    <div class="pageSection" id="libraryFilesPageSection"></div>
+    <div class="defaultViewMessageContainer" id="defaultLibraryViewMessageContainer">
+      <div>
+        <h2>
+          Library
+        </h2>
+        <p>Your uploaded files will be saved to your Library</p>
+      </div>
+    </div>
+  </div>
+  <div class="view" id="scoreView">
+    <div class="hidden" id="controlBar">
+      <div class="controlButton hidden disabled" id="startControlButton" title="Start Following">
+        <img class="controlButtonIcon" src="style/icons/microphone.svg" />
+      </div>
+      <div class="controlButton hidden disabled" id="stopControlButton" title="Stop Following">
+        <img class="controlButtonIcon" src="style/icons/mute-microphone.svg" />
+      </div>
+      <div class="controlButton hidden disabled" id="resetControlButton" title="Reset Cursor to Beginning">
+        <img class="controlButtonIcon" src="style/icons/rewind-sign.svg" />
+      </div>
+      <div class="controlButton hidden disabled" id="skipControlButton" title="Move Cursor Forward">
+        <img class="controlButtonIcon" src="style/icons/fast-forward-button.svg" />
+      </div>
+    </div>
+    <div class="pageSection">
+      <div id="scoreContainer"></div>
+    </div>
+    <div class="defaultViewMessageContainer" id="defaultScoreViewMessageContainer">
+      <div>
+        <h2>
+          Simple Score Follower
+        </h2>
+        <p><a onclick="scoreInput.click()" href="#">Upload a score</a> or <a onclick="loadSampleScore()" href="#">load a sample score</a></p>
+      </div>
+    </div>
+  </div>
+  <div id="footer">
+    <div class="footerItem" id="githubContainer" title="View on Github">
+      <span>
+        Project by Claire Chan
+      </span>
+      <a href="https://github.com/clairehkc/score-following">
+      <img src="style/icons/GitHub-Mark-Light-64px.png" id="githubIcon" /></a>
+    </div>
+    <div class="footerItem">
+      <span>
+        Icons by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+      </span>
+    </div>
+  </div>
+</body>
+
+</html>
