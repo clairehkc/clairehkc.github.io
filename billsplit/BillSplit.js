@@ -1,85 +1,72 @@
 let subtotal = total = 0;
+const isInt = /^[1-9]\d*$\b/g;
 
 function loadGroupSample() {
 	const input = document.getElementById("billInput").value = `
-Claire (You)
-1
-Popcorn Chicken
-$7.95
-1
-Boba Milk Tea
-$4.75
- 	Choice of Ice
- 	25% (Little Ice) ($0.00)
- 	Choice of Preparation
- 	Black Tea ($0.00)
- 	Choice of Sweetness
- 	25% (Little Sweet) ($0.00)
-Jill
-1
-Taro Milk Tea
-$5.25
- 	Choice of Ice
- 	25% (Little Ice) ($0.00)
- 	Choice of Toppings
- 	Boba ($0.50)
- 	Choice of Sweetness
- 	25% (Little Sweet) ($0.00)
-1
-Popcorn Chicken
-$7.95
-Frederick
-1
-Mango Passion Fruit Tea
-$5.75
- 	Choice of Sweetness
- 	50% (Half Sweet) ($0.00)
- 	Choice of Ice
- 	25% (Little Ice) ($0.00)
- 	Choice of Toppings
- 	Lychee Jelly ($0.50)
-Vince Vince
-1
-Popcorn Chicken
-$7.95
-.
+david (You)
+1	Super Burrito
+$11.52
+ 	Choice of Meat
+ 	Pastor (Marinated Pork) ($0.00)
+ 	Choice of Beans
+ 	Black Beans ($0.00)
+ 	Tortilla Option
+ 	Flour (Recommended) ($0.00)
+Claire
+1	Super Quesadilla Suiza
+$13.70
+ 	Choice of Meat
+ 	Asada (Steak) ($2.00)
+ 	Tortilla Option
+ 	Flour (Recommended) ($0.00)
+Vince
+1	Super Burrito
+$11.52
+ 	Choice of Meat
+ 	Pastor (Marinated Pork) ($0.00)
+ 	Choice of Beans
+ 	Pinto Beans ($0.00)
+ 	Tortilla Option
+ 	Tomato ($0.00)
  
-Subtotal	$39.60
-Tax	$2.33
-Promotion	-$5.94
-Service Fee 	$5.94
-Discount		-$1.98
-Delivery Fee 	$3.99
-Delivery Discount		-$3.99
-Delivery person tip	$10.37
+Subtotal	$36.74
+Tax	$3.12
+Service Fee 	$5.51
+Delivery Fee 	$1.99
+Delivery person tip	$7.10
 `
 }
 
 function loadRegularSample() {
 	const input = document.getElementById("billInput").value = `
-1
-Bruschetta
-$7.00
-1
-Garlic Bread
-$5.00
-1
-Fettuccini Alfredo
-$14.00
-1
-Nonni’s Italian Pot Roast
-$20.00
-1
-Fried Calamari
-$15.00
+1	Super Burrito
+$11.52
+ 	Choice of Meat
+ 	Pastor (Marinated Pork) ($0.00)
+ 	Choice of Beans
+ 	Black Beans ($0.00)
+ 	Tortilla Option
+ 	Flour (Recommended) ($0.00)
+1	Super Quesadilla Suiza
+$13.70
+ 	Choice of Meat
+ 	Asada (Steak) ($2.00)
+ 	Tortilla Option
+ 	Flour (Recommended) ($0.00)
+1	Super Burrito
+$11.52
+ 	Choice of Meat
+ 	Pastor (Marinated Pork) ($0.00)
+ 	Choice of Beans
+ 	Pinto Beans ($0.00)
+ 	Tortilla Option
+ 	Tomato ($0.00)
  
-Subtotal	$61.00
-Tax	$5.34
-Service Fee 	$9.15
-Discount		-$3.05
-Delivery Fee 	$5.99
-Delivery Discount		-$5.99
-Tip	$16.29
+Subtotal	$36.74
+Tax	$3.12
+Service Fee 	$5.51
+Delivery Fee 	$1.99
+Delivery person tip	$7.10
 `
 }
 
@@ -238,48 +225,75 @@ function splitBill(manualInputDetails = null) {
 	reset();
 	const details = manualInputDetails || {};
 	const input = document.getElementById("billInput").value.trim();
-	let tax = promotion = serviceFee = discount = offer = deliveryFee = deliveryDiscount = tip = 0;
+	let tax = promotion = serviceFee = discount = offer = regulatory = deliveryFee = caDriver = deliveryDiscount = tip = 0;
 	const lines = input.split('\n');
 	let currentUser;
+	let nextUser;
+	let previousUser;
 
 	for (let i = 0; i < lines.length; i++) {
 		if (!manualInputDetails) {
-			const isInt = /^[1-9]\d*$\b/g;
-			const matchedInt = lines[i].match(isInt);
-			
+			const itemQuantityLineSplit = lines[i].split('\t');
+			const matchedInt = itemQuantityLineSplit.length > 0 && itemQuantityLineSplit[0].match(isInt);
+
 			// found new order item
-			if (matchedInt && matchedInt.length === 1) {			
+			if (matchedInt && matchedInt.length > 0) {			
 				if (i == lines.length - 1) {
 					console.error("invalid input");
 					displayErrorMessage();
 					return;
 				}
 
-				const itemLineIndex = i;
+				const itemQuantityLineIndex = i;
 				const itemQuantity = parseInt(matchedInt[0]);
 
-				if (itemLineIndex > 0) {
-					const potentialUser = lines[itemLineIndex-1];
-					if (!(potentialUser.startsWith("$") || /^\s/.test(potentialUser))) {
-						// found new user
-						const user = potentialUser.trim();
-						currentUser = user;
-						details[currentUser] = {items: [], total: 0, fees: 0};
+				if (itemQuantityLineIndex > 0) {
+					if (nextUser) {
+						// nextUser found on previous line
+						currentUser = nextUser;
+						nextUser = undefined;
+					} else {
+						const potentialUser = lines[itemQuantityLineIndex - 1];
+						if (!((potentialUser.includes("$") && potentialUser.includes(".")) || /^\s/.test(potentialUser))) {
+							// found new user
+							const user = potentialUser.trim();
+							currentUser = user;
+						}
 					}
 				}
 
 				if (!currentUser) {
 					// no user, ask to assign users
 					currentUser = "TBD";
-					details[currentUser] = {items: {}, total: 0, fees: 0};
 				}
 
-				let itemName = lines[itemLineIndex+1];
-				let itemPrice = lines[itemLineIndex+2];
+				if (currentUser !== previousUser) {
+					details[currentUser] = {items: {}, total: 0, fees: 0};
+				}
+				previousUser = currentUser;
+
+				// item quantity and name may be on the same line or on 2 consecutive lines
+				// item name and price be on the same line or on 2 consecutive lines
+				let itemName =  itemQuantityLineSplit.length > 1 ? itemQuantityLineSplit[1] : lines[itemQuantityLineIndex + 1];
+				let itemPrice = itemQuantityLineSplit.length > 1 ? lines[itemQuantityLineIndex + 1] : lines[itemQuantityLineIndex + 2];
+
 				if (!(itemPrice.startsWith("$"))) {
-					console.error("invalid input");
-					displayErrorMessage();
-					return;
+					const itemNameSplit = itemName.split("$");
+					if (itemNameSplit.length > 1) {
+						// lack of spacing between last item price and next user name
+						itemName = itemNameSplit[0];
+						itemPrice = itemNameSplit[1];
+						if (itemPrice.includes(".") && isNaN(parseInt(itemPrice[itemPrice.length - 1]))) {
+							// split after . and decimal places in item price
+							const nextUserNameStartIndex = itemPrice.indexOf(".") + 3;
+							nextUser = itemPrice.slice(nextUserNameStartIndex);
+							itemPrice = itemPrice.slice(0, nextUserNameStartIndex);
+						}
+					} else {
+						console.error("invalid input");
+						displayErrorMessage();
+						return;
+					}
 				}
 
 				itemPrice = priceToFloat(itemPrice);
@@ -306,7 +320,7 @@ function splitBill(manualInputDetails = null) {
 				details[currentUser].items[itemName] = {};
 				details[currentUser].items[itemName].price = itemPrice;
 				details[currentUser].items[itemName].quantity = itemQuantity;
-				details[currentUser].total = details[currentUser].total + itemPrice * itemQuantity;
+				details[currentUser].total = details[currentUser].total + itemPrice;
 				continue;
 			}
 		}
@@ -315,7 +329,8 @@ function splitBill(manualInputDetails = null) {
 		if (cleanedLine.startsWith("SUBTOTAL")) {
 			subtotal = priceToFloat(getEOLPrice(lines[i]));
 			const calculatedSubtotal = Object.values(details).reduce((total, userDetail) => userDetail.total + total, 0);
-			if (subtotal != calculatedSubtotal) {
+
+			if (Math.abs(subtotal - calculatedSubtotal) > 1) {
 				console.error("invalid input");
 				displayErrorMessage();
 				return;
@@ -330,13 +345,19 @@ function splitBill(manualInputDetails = null) {
 			distributeFees(details, promotion);
 		} else if (cleanedLine.startsWith("SERVICEFEE")) {
 			serviceFee = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, serviceFee, true)
+			distributeFees(details, serviceFee, true);
+		} else if (cleanedLine.startsWith("CADRIVER")) {
+			caDriver = priceToFloat(getEOLPrice(lines[i]));
+			distributeFees(details, caDriver);
 		} else if (cleanedLine.startsWith("DISCOUNT")) {
 			discount = priceToFloat(getEOLPrice(lines[i]));
 			distributeFees(details, discount);
 		} else if (cleanedLine.includes("OFFER")) {
 			offer = priceToFloat(getEOLPrice(lines[i]));
 			distributeFees(details, offer);
+		} else if (cleanedLine.startsWith("REGULATORY")) {
+			regulatory = priceToFloat(getEOLPrice(lines[i]));
+			distributeFees(details, regulatory);
 		} else if (cleanedLine.startsWith("DELIVERYFEE")) {
 			deliveryFee = priceToFloat(getEOLPrice(lines[i]));
 			distributeFees(details, deliveryFee);
@@ -357,12 +378,13 @@ function splitBill(manualInputDetails = null) {
 	});
 
 	if (total == 0) {
-		// input was missing total
-		total = subtotal + tax + promotion + serviceFee + discount + deliveryFee + deliveryDiscount + tip; 
+		// input did not list total, sum subtotal, fees, discounts
+		total = subtotal + tax + promotion + serviceFee + caDriver + discount + offer + regulatory + deliveryFee + deliveryDiscount + tip; 
 	}
 
 	const calculatedTotal = Object.values(details).reduce((total, userDetail) => userDetail.total + total, 0);
-	if (Math.abs(total - calculatedTotal) > 0.5) {
+
+	if (Math.abs(total - calculatedTotal) > 1) {
 		console.error("invalid input");
 		displayErrorMessage();
 		return;

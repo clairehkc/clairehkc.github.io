@@ -10,14 +10,14 @@
 			<div id="billInputContainer">
 				<div id="billInputTitle">Paste Bill:</div>
 				<div id="billInputDescription">
-					<p>Copy/Paste the pricing info from your email receipt.</p>
+					<p>Copy/Paste the pricing info from your email or web receipt.</p>
 					<p>Currently supports: Uber Eats</p>
 				</div>
 				<textarea id="billInput" rows="15" cols="50"></textarea>
 				<div id=buttonContainer>
-					<button id="splitButton" onclick="splitBill()">Split Bill</button>
-					<button onclick="loadGroupSample()">Sample Group Bill</button>
-					<button onclick="loadRegularSample()">Sample Bill</button>
+					<button class="primary" id="splitButton" onclick="splitBill()">Split Bill</button>
+					<button class="secondary" onclick="loadGroupSample()">Sample Group Bill</button>
+					<button class="secondary" onclick="loadRegularSample()">Sample Bill</button>
 				</div>
 			</div>
 			<div id="splitResultsContainer">
