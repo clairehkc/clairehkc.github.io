@@ -1,5 +1,7 @@
-let subtotal = total = 0;
 const isInt = /^[1-9]\d*$\b/g;
+let userOrderDetails;
+let numUsers;
+let subtotal = total = 0;
 
 function loadGroupSample() {
 	const input = document.getElementById("billInput").value = `
@@ -84,10 +86,8 @@ function priceToFloat(price) {
 	return priceInFloat;
 }
 
-function distributeFees(details, value, isPercentage = false) {
-	const numUsers = Object.keys(details).length;
-	
-	Object.values(details).forEach(userDetail => {
+function distributeFees(value, isPercentage = false) {
+	Object.values(userOrderDetails).forEach(userDetail => {
 		const amountToAdd = isPercentage ? userDetail.total * value / subtotal : value / numUsers;
 		;
 		userDetail.fees += amountToAdd;
@@ -297,7 +297,7 @@ function splitBill(manualInputDetails = null) {
 				}
 
 				itemPrice = priceToFloat(itemPrice);
-
+				// assign items to users
 				if (itemQuantity > 1 && currentUser == "TBD") {
 					// automatically split multi-quantity items for assignment mode in non-group orders
 					for (let j = 0; j < itemQuantity; j++) {
@@ -325,6 +325,7 @@ function splitBill(manualInputDetails = null) {
 			}
 		}
 
+		// confirm subtotal = sum of user totals
 		const cleanedLine = lines[i].trim().toUpperCase().replace(/(\s+)/g, "");
 		if (cleanedLine.startsWith("SUBTOTAL")) {
 			subtotal = priceToFloat(getEOLPrice(lines[i]));
@@ -337,36 +338,39 @@ function splitBill(manualInputDetails = null) {
 			}
 		}
 
+		// distribute order fees between users
+		userOrderDetails = details;
+		numUsers = Object.keys(details).length;
 		if (cleanedLine.startsWith("TAX")) {
 			tax = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, tax, true);
+			distributeFees(tax, true);
 		} else if (cleanedLine.startsWith("PROMOTION")) {
 			promotion = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, promotion);
+			distributeFees(promotion);
 		} else if (cleanedLine.startsWith("SERVICEFEE")) {
 			serviceFee = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, serviceFee, true);
+			distributeFees(serviceFee, true);
 		} else if (cleanedLine.startsWith("CADRIVER")) {
 			caDriver = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, caDriver);
+			distributeFees(caDriver);
 		} else if (cleanedLine.startsWith("DISCOUNT")) {
 			discount = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, discount);
+			distributeFees(discount);
 		} else if (cleanedLine.includes("OFFER")) {
 			offer = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, offer);
+			distributeFees(offer);
 		} else if (cleanedLine.startsWith("REGULATORY")) {
 			regulatory = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, regulatory);
+			distributeFees(regulatory);
 		} else if (cleanedLine.startsWith("DELIVERYFEE")) {
 			deliveryFee = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, deliveryFee);
+			distributeFees(deliveryFee);
 		} else if (cleanedLine.startsWith("DELIVERYDISCOUNT")) {
 			deliveryDiscount = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, deliveryDiscount);
+			distributeFees(deliveryDiscount);
 		} else if (cleanedLine.startsWith("DELIVERYPERSONTIP") || cleanedLine.startsWith("TIP")) {
 			tip = priceToFloat(getEOLPrice(lines[i]));
-			distributeFees(details, tip, true)
+			distributeFees(tip, true)
 		} else if (cleanedLine.startsWith("TOTAL")) {
 			total = priceToFloat(getEOLPrice(lines[i]));
 		}
@@ -378,7 +382,7 @@ function splitBill(manualInputDetails = null) {
 	});
 
 	if (total == 0) {
-		// input did not list total, sum subtotal, fees, discounts
+		// if input did not list total, sum the subtotal, fees, discounts
 		total = subtotal + tax + promotion + serviceFee + caDriver + discount + offer + regulatory + deliveryFee + deliveryDiscount + tip; 
 	}
 
